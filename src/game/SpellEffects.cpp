@@ -5833,7 +5833,7 @@ void Spell::EffectDuel(uint32 i)
     // Players can only fight a duel with each other outside (=not inside dungeons and not in capital cities)
     // Don't have to check the target's map since you cannot challenge someone across maps
     uint32 mapid = caster->GetMapId();
-    if( mapid != 0 && mapid != 1 && mapid != 530 && mapid != 571 && mapid != 609)
+    if( mapid != 0 && mapid != 1 && mapid != 530 && mapid != 571 && mapid != 609 && mapid != 37)
     {
         SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here
         return;
