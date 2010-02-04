@@ -2370,6 +2370,17 @@ bool InstanceMap::CanEnter(Player *player)
         return false;
     }
 
+    if(i_data && i_data->IsEncounterInProgress())
+    {
+        if(player->isDead())
+        {
+            player->ResurrectPlayer(0.5f);
+            player->SpawnCorpseBones();
+        }
+        player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
+        return false;
+    }
+
     return Map::CanEnter(player);
 }
 
