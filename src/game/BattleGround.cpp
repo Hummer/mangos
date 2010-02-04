@@ -797,9 +797,36 @@ void BattleGround::EndBattleGround(uint32 winner)
         {
             RewardMark(plr,ITEM_WINNER_COUNT);
             RewardQuestComplete(plr);
+            if(isBattleGround())
+            {
+                RewardItem(plr, 45624, 2);
+                RewardItem(plr, 40753, 2);
+                if(GetTypeID() == BATTLEGROUND_AV)
+                {
+                    RewardItem(plr, 42425, 1);
+                    RewardItem(plr, 43589, 1);
+                    RewardItem(plr, 47395, 1);
+                }
+            }
         }
         else
+        {
             RewardMark(plr,ITEM_LOSER_COUNT);
+            if(isBattleGround())
+            {
+                RewardItem(plr, 40753, 1);
+                RewardItem(plr, 40752, 1);
+                if(GetTypeID() == BATTLEGROUND_AV)
+                {
+                    switch(irand(0,2))
+                    {
+                        case 0:RewardItem(plr, 42425, 1); break;
+                        case 1:RewardItem(plr, 43589, 1); break;
+                        case 2:RewardItem(plr, 47395, 1); break;
+                    }
+                }
+            }
+        }
 
         plr->CombatStopWithPets(true);
 
