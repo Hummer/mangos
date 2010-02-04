@@ -3769,7 +3769,7 @@ bool Player::resetTalents(bool no_cost)
     if(m_canTitanGrip)
     {
         m_canTitanGrip = false;
-        if(sWorld.getConfig(CONFIG_OFFHAND_CHECK_AT_TALENTS_RESET))
+        if(sWorld.getConfig(CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN))
             AutoUnequipOffhandIfNeed();
     }
 
