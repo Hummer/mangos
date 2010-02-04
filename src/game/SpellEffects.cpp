@@ -218,8 +218,8 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectMilling,                                  //158 SPELL_EFFECT_MILLING                  milling
     &Spell::EffectRenamePet,                                //159 SPELL_EFFECT_ALLOW_RENAME_PET         allow rename pet once again
     &Spell::EffectNULL,                                     //160 SPELL_EFFECT_160                      unused
-    &Spell::EffectNULL,                                     //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
-    &Spell::EffectNULL,                                     //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
+    &Spell::EffectSpecCount,                                //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
+    &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
 };
 
 void Spell::EffectNULL(uint32 /*i*/)
@@ -5859,7 +5859,7 @@ void Spell::EffectDuel(uint32 i)
     // Players can only fight a duel with each other outside (=not inside dungeons and not in capital cities)
     // Don't have to check the target's map since you cannot challenge someone across maps
     uint32 mapid = caster->GetMapId();
-    if( mapid != 0 && mapid != 1 && mapid != 530 && mapid != 571 && mapid != 609)
+    if( mapid != 0 && mapid != 1 && mapid != 530 && mapid != 571 && mapid != 609 && mapid != 37)
     {
         SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here
         return;
@@ -5950,7 +5950,11 @@ void Spell::EffectStuck(uint32 /*i*/)
 
     // homebind location is loaded always
     pTarget->TeleportToHomebind(unitTarget==m_caster ? TELE_TO_SPELL : 0);
-
+    if(pTarget->isDead())
+{
+       pTarget->ResurrectPlayer(1.0f);
+       pTarget->SpawnCorpseBones();
+}
     // Stuck spell trigger Hearthstone cooldown
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(8690);
     if(!spellInfo)
@@ -7159,4 +7163,20 @@ void Spell::EffectPlayMusic(uint32 i)
     WorldPacket data(SMSG_PLAY_MUSIC, 4);
     data << uint32(soundid);
     ((Player*)unitTarget)->GetSession()->SendPacket(&data);
+}
+
+void Spell::EffectSpecCount(uint32 /*eff_idx*/)
+{
+    if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ((Player*)unitTarget)->UpdateSpecCount(damage);
+}
+
+void Spell::EffectActivateSpec(uint32 /*eff_idx*/)
+{
+    if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ((Player*)unitTarget)->ActivateSpec(damage-1);  // damage is 1 or 2, spec is 0 or 1
 }
