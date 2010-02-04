@@ -1388,6 +1388,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         (spellInfo_2->Id == 8326 && spellInfo_1->Id == 20584) )
                          return false;
 
+                    // Light Essence and Dark Essence (Twin Val'kyr bossfight)
+                    if( (spellInfo_1->Id == 65686 && spellInfo_2->Id == 65684) ||
+                        (spellInfo_2->Id == 65686 && spellInfo_1->Id == 65684) )
+                         return true;
+
                     break;
                 }
                 case SPELLFAMILY_MAGE:
