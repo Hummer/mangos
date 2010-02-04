@@ -315,6 +315,7 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     // Meteor like spells (divided damage to targets)
                     case 24340: case 26558: case 28884:     // Meteor
                     case 36837: case 38903: case 41276:     // Meteor
+                    case 57467:                             // Meteor
                     case 26789:                             // Shard of the Fallen Star
                     case 31436:                             // Malevolent Cleave
                     case 35181:                             // Dive Bomb
@@ -333,6 +334,16 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
 
                         damage /= count;                    // divide to all targets
                         break;
+                    }
+                    // AoE spells, which damage is reduced with distance from the initial hit point 
+                    case 62598: case 62937:     // Detonate 
+                    case 65279:                 // Lightning Nova 
+                    case 62311: case 64596:     // Cosmic Smash
+                    case 69075: case 70834: case 70835: case 70836: // Bone Storm
+                    { 
+                        float distance = unitTarget->GetDistance2d(m_targets.m_destX, m_targets.m_destY); 
+                        damage *= exp(-distance/15.0f); 
+                        break; 
                     }
                     // percent from health with min
                     case 25599:                             // Thundercrash
@@ -4890,6 +4901,21 @@ void Spell::EffectWeaponDmg(uint32 i)
         }
         else if(uint32 ammo = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID))
             ((Player*)m_caster)->DestroyItemCount(ammo, 1, true);
+    }
+
+    switch(m_spellInfo->Id)                     // for spells with divided damage to targets
+    {
+        case 66765: case 67333:                 // Meteor Fists
+        case 69055: case 71021: case 70814:     // Saber Lash
+        {
+            uint32 count = 0;
+            for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit) 
+            ++count;
+
+            m_damage /= count;                    // divide to all targets
+            break;
+        }
+        break;
     }
 }
 
