@@ -2071,13 +2071,14 @@ void ObjectMgr::LoadItemPrototypes()
 
         for(int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
         {
-            if(entry->ItemId[j] <= 0)
+            if (entry->ItemId[j] <= 0)
                 continue;
 
             uint32 item_id = entry->ItemId[j];
 
-            if(!GetItemPrototype(item_id))
-                notFoundOutfit.insert(item_id);
+            if (!GetItemPrototype(item_id))
+                if (item_id != 40582)                       // nonexistent item by default but referenced in DBC, skip it from errors
+                    notFoundOutfit.insert(item_id);
         }
     }
 
@@ -3973,7 +3974,7 @@ void ObjectMgr::LoadQuestLocales()
 
         for(int i = 1; i < MAX_LOCALE; ++i)
         {
-            std::string str = fields[1+10*(i-1)].GetCppString();
+            std::string str = fields[1+11*(i-1)].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -3985,7 +3986,7 @@ void ObjectMgr::LoadQuestLocales()
                     data.Title[idx] = str;
                 }
             }
-            str = fields[1+10*(i-1)+1].GetCppString();
+            str = fields[1+11*(i-1)+1].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -3997,7 +3998,7 @@ void ObjectMgr::LoadQuestLocales()
                     data.Details[idx] = str;
                 }
             }
-            str = fields[1+10*(i-1)+2].GetCppString();
+            str = fields[1+11*(i-1)+2].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -4009,7 +4010,7 @@ void ObjectMgr::LoadQuestLocales()
                     data.Objectives[idx] = str;
                 }
             }
-            str = fields[1+10*(i-1)+3].GetCppString();
+            str = fields[1+11*(i-1)+3].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -4021,7 +4022,7 @@ void ObjectMgr::LoadQuestLocales()
                     data.OfferRewardText[idx] = str;
                 }
             }
-            str = fields[1+10*(i-1)+4].GetCppString();
+            str = fields[1+11*(i-1)+4].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -4033,7 +4034,7 @@ void ObjectMgr::LoadQuestLocales()
                     data.RequestItemsText[idx] = str;
                 }
             }
-            str = fields[1+10*(i-1)+5].GetCppString();
+            str = fields[1+11*(i-1)+5].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -4045,7 +4046,7 @@ void ObjectMgr::LoadQuestLocales()
                     data.EndText[idx] = str;
                 }
             }
-            str = fields[1+10*(i-1)+6].GetCppString();
+            str = fields[1+11*(i-1)+6].GetCppString();
             if(!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -4059,7 +4060,7 @@ void ObjectMgr::LoadQuestLocales()
             }
             for(int k = 0; k < 4; ++k)
             {
-                str = fields[1+10*(i-1)+6+k].GetCppString();
+                str = fields[1+11*(i-1)+7+k].GetCppString();
                 if(!str.empty())
                 {
                     int idx = GetOrNewIndexForLocale(LocaleConstant(i));
