@@ -261,3 +261,22 @@ bool ChatHandler::HandleServerMotdCommand(const char* /*args*/)
     PSendSysMessage(LANG_MOTD_CURRENT, sWorld.GetMotd());
     return true;
 }
+
+bool ChatHandler::HandleOnlineCommand(const char* /*args*/)
+{
+    uint32 AlliancePlayers = 0;
+    uint32 HordePlayers = 0;
+    HashMapHolder<Player>::MapType &m = HashMapHolder<Player>::GetContainer();
+    HashMapHolder<Player>::MapType::const_iterator itr = m.begin();
+    for(; itr != m.end(); ++itr)
+    {
+        if(itr->second->GetTeam() == ALLIANCE) 
+            ++AlliancePlayers;
+        else
+            ++HordePlayers;
+    }
+
+    PSendSysMessage(LANG_ONLINE_PLAYERS, AlliancePlayers+HordePlayers, AlliancePlayers, HordePlayers);
+
+    return true;
+}
