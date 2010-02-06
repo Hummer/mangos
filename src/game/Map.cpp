@@ -2394,7 +2394,7 @@ bool InstanceMap::CanEnter(Player *player)
         return false;
     }
 
-    if(i_data && i_data->IsEncounterInProgress())
+    if(!player->isGameMaster() && i_data && i_data->IsEncounterInProgress())
     {
         if(player->isDead())
         {
