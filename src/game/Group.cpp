@@ -901,8 +901,9 @@ void Group::CountTheRoll(Rolls::iterator rollI, uint32 NumberOfPlayers)
     else
     {
         SendLootAllPassed(NumberOfPlayers, *roll);
-        LootItem *item = &(roll->getLoot()->items[roll->itemSlot]);
-        if(item) item->is_blocked = false;
+        //LootItem *item = &(roll->getLoot()->items[roll->itemSlot]);
+        roll->getLoot()->items[roll->itemSlot].is_blocked = false;
+        //if(item) item->is_blocked = false;
     }
     RollId.erase(rollI);
     delete roll;
