@@ -36,34 +36,25 @@ class Player;
 
 namespace MaNGOS
 {
-
-    struct MANGOS_DLL_DECL PlayerNotifier
-    {
-        explicit PlayerNotifier(Player &pl) : i_player(pl) {}
-        void Visit(PlayerMapType &);
-        template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
-        Player &i_player;
-    };
-
     struct MANGOS_DLL_DECL VisibleNotifier
     {
         Player &i_player;
+        WorldObject const&i_viewPoint;
         UpdateData i_data;
-        UpdateDataMapType i_data_updates;
-        Player::ClientGUIDs i_clientGUIDs;
-        std::set<WorldObject*> i_visibleNow;
+        std::set<Unit*> i_visibleNow;
+        Player::ClientGUIDs vis_guids;
 
-        explicit VisibleNotifier(Player &player) : i_player(player),i_clientGUIDs(player.m_clientGUIDs) {}
+        VisibleNotifier(Player &player, WorldObject const&viewPoint) :
+            i_player(player), i_viewPoint(viewPoint), vis_guids(player.m_clientGUIDs) {}
         template<class T> void Visit(GridRefManager<T> &m);
-        void Visit(PlayerMapType &);
-        void Notify(void);
+        void SendToSelf(void);
     };
 
     struct MANGOS_DLL_DECL VisibleChangesNotifier
     {
         WorldObject &i_object;
 
-        explicit VisibleChangesNotifier(WorldObject &object) : i_object(object) {}
+        VisibleChangesNotifier(WorldObject &object) : i_object(object) {}
         template<class T> void Visit(GridRefManager<T> &) {}
         void Visit(PlayerMapType &);
     };
@@ -141,13 +132,15 @@ namespace MaNGOS
         void Visit(CreatureMapType &);
     };
 
-    struct MANGOS_DLL_DECL PlayerRelocationNotifier
+
+    struct MANGOS_DLL_DECL PlayerRelocationNotifier : public VisibleNotifier
     {
-        Player &i_player;
-        PlayerRelocationNotifier(Player &pl) : i_player(pl) {}
-        template<class T> void Visit(GridRefManager<T> &) {}
-        void Visit(PlayerMapType &);
+        PlayerRelocationNotifier(Player &pl, WorldObject const& viewPoint) :
+            VisibleNotifier(pl, viewPoint) {}
+
         void Visit(CreatureMapType &);
+        void Visit(PlayerMapType &);
+        template<class T> void Visit(GridRefManager<T> &m) { VisibleNotifier::Visit(m); }
     };
 
     struct MANGOS_DLL_DECL CreatureRelocationNotifier
@@ -155,9 +148,21 @@ namespace MaNGOS
         Creature &i_creature;
         CreatureRelocationNotifier(Creature &c) : i_creature(c) {}
         template<class T> void Visit(GridRefManager<T> &) {}
-        #ifdef WIN32
-        template<> void Visit(PlayerMapType &);
-        #endif
+        void Visit(CreatureMapType &);
+        void Visit(PlayerMapType &);
+    };
+
+    struct MANGOS_DLL_DECL DelayedUnitRelocation
+    {
+        Map &i_map;
+        Cell &cell;
+        CellPair &pair;
+        const float i_radius;
+        DelayedUnitRelocation(Cell &_cell, CellPair &_pair, Map &map, float radius) :
+            cell(_cell), pair(_pair), i_map(map), i_radius(radius) {}
+        template<class T> void Visit(GridRefManager<T> &) {}
+        void Visit(CreatureMapType &);
+        void Visit(PlayerMapType   &);
     };
 
     struct MANGOS_DLL_DECL DynamicObjectUpdater
@@ -1060,10 +1065,6 @@ namespace MaNGOS
     };
 
     #ifndef WIN32
-    template<> void PlayerRelocationNotifier::Visit<Creature>(CreatureMapType &);
-    template<> void PlayerRelocationNotifier::Visit<Player>(PlayerMapType &);
-    template<> void CreatureRelocationNotifier::Visit<Player>(PlayerMapType &);
-    template<> void CreatureRelocationNotifier::Visit<Creature>(CreatureMapType &);
     template<> inline void DynamicObjectUpdater::Visit<Creature>(CreatureMapType &);
     template<> inline void DynamicObjectUpdater::Visit<Player>(PlayerMapType &);
     #endif
