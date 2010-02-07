@@ -219,8 +219,7 @@ class Quest
         std::string GetEndText() const { return EndText; }
         std::string GetCompletedText() const { return CompletedText; }
         int32  GetRewOrReqMoney() const;
-        uint32 GetRewHonorAddition() const { return RewHonorAddition; }
-        float GetRewHonorMultiplier() const { return RewHonorMultiplier; }
+        uint32 GetRewHonorableKills() const { return RewHonorableKills; }
         uint32 GetRewMoneyMaxLevel() const { return RewMoneyMaxLevel; }
                                                             // use in XP calculation at client
         uint32 GetRewSpell() const { return RewSpell; }
@@ -315,8 +314,7 @@ class Quest
         std::string RequestItemsText;
         std::string EndText;
         std::string CompletedText;
-        uint32 RewHonorAddition;
-        float RewHonorMultiplier;
+        uint32 RewHonorableKills;
         int32  RewOrReqMoney;
         uint32 RewMoneyMaxLevel;
         uint32 RewSpell;
