@@ -5563,7 +5563,7 @@ bool ChatHandler::HandlePDumpWriteCommand(const char *args)
             return false;
         }
 
-        guid = sObjectMgr.GetPlayerGUIDByName(name);
+        guid = GUID_LOPART(sObjectMgr.GetPlayerGUIDByName(name));
     }
 
     if(!sObjectMgr.GetPlayerAccountIdByGUID(guid))
