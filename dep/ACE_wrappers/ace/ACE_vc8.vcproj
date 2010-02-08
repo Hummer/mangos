@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ACE"
-	ProjectGUID="{AD537C9A-FECA-1BAD-6757-8A6348EA12C8}"
+	ProjectGUID="{AD537C9A-FECA-1BAD-6757-8A63228BB87C}"
 	RootNamespace="ACE"
 	Keyword="Win32Proj"
 	SignManifests="true"
@@ -25,6 +25,7 @@
 			IntermediateDirectory="Debug\ACE_vc8\I386"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -51,7 +52,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="ACE_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+				PreprocessorDefinitions="ACE_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;MPC_LIB_MODIFIER=\&quot;d\&quot;"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -107,6 +108,7 @@
 			IntermediateDirectory="Release\ACE_vc8\I386"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -188,6 +190,7 @@
 			IntermediateDirectory="Debug\ACE_vc8\AMD64"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -214,7 +217,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories=".."
-				PreprocessorDefinitions="ACE_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE"
+				PreprocessorDefinitions="ACE_BUILD_DLL;_DEBUG;WIN32;_WINDOWS;_CRT_NONSTDC_NO_WARNINGS;_AMD64_;_WIN64;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;MPC_LIB_MODIFIER=\&quot;d\&quot;"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -271,6 +274,7 @@
 			IntermediateDirectory="Release\ACE_vc8\AMD64"
 			ConfigurationType="2"
 			CharacterSet="0"
+
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -353,7 +357,7 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;cxx;cc;C;c">
+			Filter="cpp;cxx;cc;c;C">
 			<File
 				RelativePath="ACE.cpp">
 			</File>
@@ -899,6 +903,9 @@
 			</File>
 			<File
 				RelativePath="OS_NS_wchar.cpp">
+			</File>
+			<File
+				RelativePath="OS_NS_wctype.cpp">
 			</File>
 			<File
 				RelativePath="OS_QoS.cpp">
@@ -1460,9 +1467,6 @@
 				RelativePath="config-all.h">
 			</File>
 			<File
-				RelativePath="config-borland-common.h">
-			</File>
-			<File
 				RelativePath="config-cray.h">
 			</File>
 			<File
@@ -1517,10 +1521,19 @@
 				RelativePath="config-lynxos.h">
 			</File>
 			<File
+				RelativePath="config-macosx-iphone-hardware.h">
+			</File>
+			<File
+				RelativePath="config-macosx-iphone-simulator.h">
+			</File>
+			<File
 				RelativePath="config-macosx-leopard.h">
 			</File>
 			<File
 				RelativePath="config-macosx-panther.h">
+			</File>
+			<File
+				RelativePath="config-macosx-snowleopard.h">
 			</File>
 			<File
 				RelativePath="config-macosx-tiger.h">
@@ -1634,15 +1647,6 @@
 				RelativePath="config-vxworks.h">
 			</File>
 			<File
-				RelativePath="config-vxworks5.x.h">
-			</File>
-			<File
-				RelativePath="config-vxworks6.2.h">
-			</File>
-			<File
-				RelativePath="config-vxworks6.3.h">
-			</File>
-			<File
 				RelativePath="config-vxworks6.4.h">
 			</File>
 			<File
@@ -1652,7 +1656,16 @@
 				RelativePath="config-vxworks6.6.h">
 			</File>
 			<File
+				RelativePath="config-vxworks6.7.h">
+			</File>
+			<File
+				RelativePath="config-vxworks6.8.h">
+			</File>
+			<File
 				RelativePath="config-win32-borland.h">
+			</File>
+			<File
+				RelativePath="config-win32-cegcc.h">
 			</File>
 			<File
 				RelativePath="config-win32-common.h">
@@ -1668,6 +1681,9 @@
 			</File>
 			<File
 				RelativePath="config-win32-mingw.h">
+			</File>
+			<File
+				RelativePath="config-win32-msvc-10.h">
 			</File>
 			<File
 				RelativePath="config-win32-msvc-7.h">
@@ -2375,6 +2391,9 @@
 				RelativePath="os_include\os_trace.h">
 			</File>
 			<File
+				RelativePath="os_include\os_typeinfo.h">
+			</File>
+			<File
 				RelativePath="os_include\os_ucontext.h">
 			</File>
 			<File
@@ -2574,6 +2593,9 @@
 			</File>
 			<File
 				RelativePath="OS_NS_wchar.h">
+			</File>
+			<File
+				RelativePath="OS_NS_wctype.h">
 			</File>
 			<File
 				RelativePath="OS_QoS.h">
@@ -3033,6 +3055,9 @@
 			</File>
 			<File
 				RelativePath="Token_Request_Reply.h">
+			</File>
+			<File
+				RelativePath="Tokenizer_T.h">
 			</File>
 			<File
 				RelativePath="TP_Reactor.h">
@@ -3500,7 +3525,7 @@
 		</Filter>
 		<Filter
 			Name="Inline Files"
-			Filter="i;inl">
+			Filter="i;ipp;inl">
 			<File
 				RelativePath="ACE.inl">
 			</File>
@@ -3626,6 +3651,9 @@
 			</File>
 			<File
 				RelativePath="Containers_T.inl">
+			</File>
+			<File
+				RelativePath="Countdown_Time.inl">
 			</File>
 			<File
 				RelativePath="Date_Time.inl">
@@ -4007,6 +4035,9 @@
 			</File>
 			<File
 				RelativePath="OS_NS_wchar.inl">
+			</File>
+			<File
+				RelativePath="OS_NS_wctype.inl">
 			</File>
 			<File
 				RelativePath="OS_TLI.inl">
@@ -6354,6 +6385,33 @@
 			</File>
 			<File
 				RelativePath="Timer_Wheel_T.cpp">
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="true">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					ExcludedFromBuild="true">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="Tokenizer_T.cpp">
 				<FileConfiguration
 					Name="Debug|Win32"
 					ExcludedFromBuild="true">
