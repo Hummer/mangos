@@ -1,4 +1,4 @@
-// $Id: Mutex.cpp 84282 2009-01-30 15:04:29Z msmit $
+// $Id: Mutex.cpp 80826 2008-03-04 14:51:23Z wotte $
 
 #include "ace/Mutex.h"
 
@@ -13,7 +13,7 @@
 
 ACE_RCSID (ace,
            Mutex,
-           "$Id: Mutex.cpp 84282 2009-01-30 15:04:29Z msmit $")
+           "$Id: Mutex.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -22,7 +22,6 @@ ACE_ALLOC_HOOK_DEFINE(ACE_Mutex)
 void
 ACE_Mutex::dump (void) const
 {
-#if defined (ACE_HAS_DUMP)
 // ACE_TRACE ("ACE_Mutex::dump");
 
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
@@ -32,7 +31,6 @@ ACE_Mutex::dump (void) const
 #endif /* ACE_HAS_PTHREADS || ACE_HAS_STHREADS */
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\n")));
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
-#endif /* ACE_HAS_DUMP */
 }
 
 ACE_Mutex::ACE_Mutex (int type, const ACE_TCHAR *name,

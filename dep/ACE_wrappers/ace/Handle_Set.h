@@ -4,7 +4,7 @@
 /**
  *  @file    Handle_Set.h
  *
- *  $Id: Handle_Set.h 82723 2008-09-16 09:35:44Z johnnyw $
+ *  $Id: Handle_Set.h 80826 2008-03-04 14:51:23Z wotte $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -22,6 +22,10 @@
 
 #include "ace/os_include/sys/os_select.h"
 #include "ace/os_include/os_limits.h"
+
+#if defined (__QNX__)
+   typedef long fd_mask;
+#endif /* __QNX__ */
 
 // Default size of the ACE Reactor.
 #if defined (FD_SETSIZE)

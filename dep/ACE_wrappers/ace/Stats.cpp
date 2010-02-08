@@ -1,4 +1,4 @@
-// $Id: Stats.cpp 83735 2008-11-14 09:41:52Z johnnyw $
+// $Id: Stats.cpp 80826 2008-03-04 14:51:23Z wotte $
 
 #include "ace/Stats.h"
 
@@ -9,7 +9,7 @@
 #include "ace/OS_NS_stdio.h"
 #include "ace/OS_NS_string.h"
 
-ACE_RCSID(ace, Stats, "$Id: Stats.cpp 83735 2008-11-14 09:41:52Z johnnyw $")
+ACE_RCSID(ace, Stats, "$Id: Stats.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -273,10 +273,15 @@ ACE_Stats::print_summary (const u_int precision,
     }
   else
     {
+#if !defined (ACE_HAS_WINCE)
       ACE_OS::fprintf (file,
                        ACE_TEXT ("ACE_Stats::print_summary: OVERFLOW: %s\n"),
                        ACE_OS::strerror (overflow_));
-
+#else
+      // WinCE doesn't have strerror ;(
+      ACE_OS::fprintf (file,
+                       ACE_TEXT ("ACE_Stats::print_summary: OVERFLOW\n"));
+#endif /* ACE_HAS_WINCE */
       return -1;
     }
 }

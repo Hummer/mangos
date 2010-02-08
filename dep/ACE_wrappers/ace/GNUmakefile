@@ -8,7 +8,7 @@
 # this file will be lost the next time it is generated.
 #
 # MPC Command:
-# /export/anduriltmp/bczar/DOC_ROOT/stage-8122/ACE_wrappers/bin/mwc.pl -type gnuace -exclude "TAO/TAO_*.mwc,TAO/CIAO/CIAO_*.mwc" -recurse -hierarchy -relative ACE_ROOT=/export/anduriltmp/bczar/DOC_ROOT/stage-8122/ACE_wrappers -relative TAO_ROOT=/export/anduriltmp/bczar/DOC_ROOT/stage-8122/ACE_wrappers/TAO -relative CIAO_ROOT=/export/anduriltmp/bczar/DOC_ROOT/stage-8122/ACE_wrappers/TAO/CIAO -relative DANCE_ROOT=/export/anduriltmp/bczar/DOC_ROOT/stage-8122/ACE_wrappers/TAO/CIAO/DAnCE
+# /export/anduriltmp/bczar/DOC_ROOT/stage-10168/ACE_wrappers/bin/mwc.pl -type gnuace -exclude "TAO/TAO_*.mwc,TAO/CIAO/CIAO_*.mwc" -recurse -hierarchy -relative ACE_ROOT=/export/anduriltmp/bczar/DOC_ROOT/stage-10168/ACE_wrappers -relative TAO_ROOT=/export/anduriltmp/bczar/DOC_ROOT/stage-10168/ACE_wrappers/TAO -relative CIAO_ROOT=/export/anduriltmp/bczar/DOC_ROOT/stage-10168/ACE_wrappers/TAO/CIAO
 #
 #----------------------------------------------------------------------------
 
@@ -20,14 +20,13 @@ endif
 
 include $(ACE_ROOT)/include/makeinclude/macros.GNU
 
-all: ACE ACE_FlReactor ACE_Qt3Reactor_moc ACE_Qt3Reactor ACE_TkReactor ACE_XtReactor ACE_ETCL ACE_ETCL_Parser Monitor_Control-target SSL-target
+all: ACE ACE_FlReactor ACE_Qt3Reactor ACE_TkReactor ACE_XtReactor ACE_ETCL ACE_ETCL_Parser Monitor_Control-target SSL-target
 
 REMAINING_TARGETS := $(subst all, , $(TARGETS_NESTED:.nested=)) $(CUSTOM_TARGETS)
 
 $(REMAINING_TARGETS):
 	@$(MAKE) -f GNUmakefile.ACE $(@)
 	@$(MAKE) -f GNUmakefile.ACE_FlReactor $(@)
-	@$(MAKE) -f GNUmakefile.ACE_Qt3Reactor_moc $(@)
 	@$(MAKE) -f GNUmakefile.ACE_Qt3Reactor $(@)
 	@$(MAKE) -f GNUmakefile.ACE_TkReactor $(@)
 	@$(MAKE) -f GNUmakefile.ACE_XtReactor $(@)
@@ -44,12 +43,8 @@ ACE:
 ACE_FlReactor: ACE
 	@$(MAKE) -f GNUmakefile.ACE_FlReactor all
 
-.PHONY: ACE_Qt3Reactor_moc
-ACE_Qt3Reactor_moc:
-	@$(MAKE) -f GNUmakefile.ACE_Qt3Reactor_moc all
-
 .PHONY: ACE_Qt3Reactor
-ACE_Qt3Reactor: ACE ACE_Qt3Reactor_moc
+ACE_Qt3Reactor: ACE
 	@$(MAKE) -f GNUmakefile.ACE_Qt3Reactor all
 
 .PHONY: ACE_TkReactor
@@ -82,7 +77,6 @@ project_name_list:
 	@echo ACE
 	@echo ACE_FlReactor
 	@echo ACE_Qt3Reactor
-	@echo ACE_Qt3Reactor_moc
 	@echo ACE_TkReactor
 	@echo ACE_XtReactor
 	@echo Monitor_Control-target

@@ -1,4 +1,4 @@
-// $Id: SOCK_SEQPACK_Connector.cpp 83735 2008-11-14 09:41:52Z johnnyw $
+// $Id: SOCK_SEQPACK_Connector.cpp 80826 2008-03-04 14:51:23Z wotte $
 
 #include "ace/SOCK_SEQPACK_Connector.h"
 
@@ -243,7 +243,8 @@ ACE_SOCK_SEQPACK_Connector::shared_connect_finish (ACE_SOCK_SEQPACK_Association 
       if (error == EINPROGRESS || error == EWOULDBLOCK)
         {
           // This expression checks if we were polling.
-          if (*timeout == ACE_Time_Value::zero)
+          if (timeout->sec () == 0
+              && timeout->usec () == 0)
             error = EWOULDBLOCK;
           // Wait synchronously using timeout.
           else if (this->complete (new_association,

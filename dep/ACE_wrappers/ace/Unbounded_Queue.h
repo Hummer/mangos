@@ -4,7 +4,7 @@
 /**
  *  @file Unbounded_Queue.h
  *
- *  $Id: Unbounded_Queue.h 84316 2009-02-03 19:46:05Z johnnyw $
+ *  $Id: Unbounded_Queue.h 80826 2008-03-04 14:51:23Z wotte $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -185,17 +185,17 @@ public:
 
   // = Check boundary conditions.
 
-  /// Returns true if the container is empty, otherwise returns false.
+  /// Returns 1 if the container is empty, otherwise returns 0.
   /**
    * Constant time check to see if the queue is empty.
    */
-  bool is_empty (void) const;
+  int is_empty (void) const;
 
   /// Returns 0.
   /**
    * The queue cannot be full, so it always returns 0.
    */
-  bool is_full (void) const;
+  int is_full (void) const;
 
   // = Classic queue operations.
 

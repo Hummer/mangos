@@ -1,12 +1,23 @@
 // -*- C++ -*-
 //
-// $Id: Time_Value.inl 88502 2010-01-12 19:53:17Z olli $
+// $Id: Time_Value.inl 82610 2008-08-12 19:46:36Z parsons $
 
 #include "ace/Truncate.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-/// Returns the value of the object as a timeval.
+#if defined (ACE_WIN32) && defined (_WIN32_WCE)
+// Something is a bit brain-damaged here and I'm not sure what... this code
+// compiled before the OS reorg for ACE 5.4. Since then it hasn't - eVC
+// complains that the operators that return ACE_Time_Value are C-linkage
+// functions that can't return a C++ class. The only way I've found to
+// defeat this is to wrap the whole class in extern "C++".
+//    - Steve Huston, 23-Aug-2004
+extern "C++" {
+#endif
+
+// Returns the value of the object as a timeval.
+
 ACE_INLINE
 ACE_Time_Value::operator timeval () const
 {
@@ -58,19 +69,7 @@ ACE_INLINE void
 ACE_Time_Value::set (time_t sec, suseconds_t usec)
 {
   // ACE_OS_TRACE ("ACE_Time_Value::set");
-# if defined (_WIN32_WCE) && (_WIN32_WCE == 0x600) && !defined (_USE_32BIT_TIME_T) && defined (_MSC_VER)
-    // The WinCE 6.0 SDK ships with a timeval tv_sec member that uses long as type
-    // not time_t. This resolves in compilation warnings because time_t
-    // can be 64bit. Disable at this momemt the warning for just this method
-    // else we get a compile warnings each time this inline file is included
-    // this file.
-#   pragma warning (push)
-#   pragma warning (disable: 4244)
-# endif
   this->tv_.tv_sec = sec;
-# if defined (_WIN32_WCE) && (_WIN32_WCE == 0x600) && !defined (_USE_32BIT_TIME_T) && defined (_MSC_VER)
-#   pragma warning (pop)
-# endif
   this->tv_.tv_usec = usec;
 #if __GNUC__
   if (__builtin_constant_p(sec) &&
@@ -91,9 +90,10 @@ ACE_Time_Value::set (double d)
   this->normalize ();
 }
 
-/// Initializes a timespec_t.  Note that this approach loses precision
-/// since it converts the nano-seconds into micro-seconds.  But then
-/// again, do any real systems have nano-second timer precision?!
+// Initializes a timespec_t.  Note that this approach loses precision
+// since it converts the nano-seconds into micro-seconds.  But then
+// again, do any real systems have nano-second timer precision?!
+
 ACE_INLINE void
 ACE_Time_Value::set (const timespec_t &tv)
 {
@@ -118,7 +118,8 @@ ACE_Time_Value::ACE_Time_Value (time_t sec, suseconds_t usec)
   this->set (sec, usec);
 }
 
-/// Returns number of seconds.
+// Returns number of seconds.
+
 ACE_INLINE time_t
 ACE_Time_Value::sec (void) const
 {
@@ -126,7 +127,8 @@ ACE_Time_Value::sec (void) const
   return this->tv_.tv_sec;
 }
 
-/// Sets the number of seconds.
+// Sets the number of seconds.
+
 ACE_INLINE void
 ACE_Time_Value::sec (time_t sec)
 {
@@ -134,7 +136,8 @@ ACE_Time_Value::sec (time_t sec)
   this->tv_.tv_sec = ACE_Utils::truncate_cast<long> (sec);
 }
 
-/// Converts from Time_Value format into milli-seconds format.
+// Converts from Time_Value format into milli-seconds format.
+
 ACE_INLINE unsigned long
 ACE_Time_Value::msec (void) const
 {
@@ -164,7 +167,8 @@ ACE_Time_Value::msec (ACE_UINT64 &ms) /*const*/
   tv->msec (ms);
 }
 
-/// Converts from milli-seconds format into Time_Value format.
+// Converts from milli-seconds format into Time_Value format.
+
 ACE_INLINE void
 ACE_Time_Value::msec (long milliseconds)
 {
@@ -176,14 +180,16 @@ ACE_Time_Value::msec (long milliseconds)
   this->tv_.tv_usec = (milliseconds - (secs * 1000)) * 1000;
 }
 
-/// Converts from milli-seconds format into Time_Value format.
+// Converts from milli-seconds format into Time_Value format.
+
 ACE_INLINE void
 ACE_Time_Value::msec (int milliseconds)
 {
   ACE_Time_Value::msec (static_cast<long> (milliseconds));
 }
 
-/// Returns number of micro-seconds.
+// Returns number of micro-seconds.
+
 ACE_INLINE suseconds_t
 ACE_Time_Value::usec (void) const
 {
@@ -191,7 +197,8 @@ ACE_Time_Value::usec (void) const
   return this->tv_.tv_usec;
 }
 
-/// Sets the number of micro-seconds.
+// Sets the number of micro-seconds.
+
 ACE_INLINE void
 ACE_Time_Value::usec (suseconds_t usec)
 {
@@ -211,7 +218,7 @@ ACE_Time_Value::to_usec (ACE_UINT64 & usec) const
   usec = ACE_U_LongLong (this->tv_.tv_sec);
 #else
   usec = static_cast<ACE_UINT64> (this->tv_.tv_sec);
-#endif  /* ACE_LACKS_LONGLONG_T */
+#endif  /* ACE_LACKS_LONG_LONG_T */
   usec *= 1000000;
   usec += this->tv_.tv_usec;
 }
@@ -228,7 +235,8 @@ operator * (const ACE_Time_Value &tv, double d)
   return ACE_Time_Value (tv) *= d;
 }
 
-/// True if tv1 > tv2.
+// True if tv1 > tv2.
+
 ACE_INLINE bool
 operator > (const ACE_Time_Value &tv1,
             const ACE_Time_Value &tv2)
@@ -243,7 +251,8 @@ operator > (const ACE_Time_Value &tv1,
     return 0;
 }
 
-/// True if tv1 >= tv2.
+// True if tv1 >= tv2.
+
 ACE_INLINE bool
 operator >= (const ACE_Time_Value &tv1,
              const ACE_Time_Value &tv2)
@@ -258,7 +267,8 @@ operator >= (const ACE_Time_Value &tv1,
     return 0;
 }
 
-/// Returns the value of the object as a timespec_t.
+// Returns the value of the object as a timespec_t.
+
 ACE_INLINE
 ACE_Time_Value::operator timespec_t () const
 {
@@ -270,7 +280,8 @@ ACE_Time_Value::operator timespec_t () const
   return tv;
 }
 
-/// Initializes the ACE_Time_Value object from a timespec_t.
+// Initializes the ACE_Time_Value object from a timespec_t.
+
 ACE_INLINE
 ACE_Time_Value::ACE_Time_Value (const timespec_t &tv)
   // : tv_ ()
@@ -279,7 +290,8 @@ ACE_Time_Value::ACE_Time_Value (const timespec_t &tv)
   this->set (tv);
 }
 
-/// True if tv1 < tv2.
+// True if tv1 < tv2.
+
 ACE_INLINE bool
 operator < (const ACE_Time_Value &tv1,
             const ACE_Time_Value &tv2)
@@ -288,7 +300,8 @@ operator < (const ACE_Time_Value &tv1,
   return tv2 > tv1;
 }
 
-/// True if tv1 >= tv2.
+// True if tv1 >= tv2.
+
 ACE_INLINE bool
 operator <= (const ACE_Time_Value &tv1,
              const ACE_Time_Value &tv2)
@@ -297,7 +310,8 @@ operator <= (const ACE_Time_Value &tv1,
   return tv2 >= tv1;
 }
 
-/// True if tv1 == tv2.
+// True if tv1 == tv2.
+
 ACE_INLINE bool
 operator == (const ACE_Time_Value &tv1,
              const ACE_Time_Value &tv2)
@@ -307,7 +321,8 @@ operator == (const ACE_Time_Value &tv1,
     && tv1.usec () == tv2.usec ();
 }
 
-/// True if tv1 != tv2.
+// True if tv1 != tv2.
+
 ACE_INLINE bool
 operator != (const ACE_Time_Value &tv1,
              const ACE_Time_Value &tv2)
@@ -316,7 +331,8 @@ operator != (const ACE_Time_Value &tv1,
   return !(tv1 == tv2);
 }
 
-/// Add TV to this.
+// Add TV to this.
+
 ACE_INLINE ACE_Time_Value &
 ACE_Time_Value::operator+= (const ACE_Time_Value &tv)
 {
@@ -353,7 +369,8 @@ ACE_Time_Value::operator= (time_t tv)
   return *this;
 }
 
-/// Subtract TV to this.
+// Subtract TV to this.
+
 ACE_INLINE ACE_Time_Value &
 ACE_Time_Value::operator-= (const ACE_Time_Value &tv)
 {
@@ -372,7 +389,8 @@ ACE_Time_Value::operator-= (time_t tv)
   return *this;
 }
 
-/// Adds two ACE_Time_Value objects together, returns the sum.
+// Adds two ACE_Time_Value objects together, returns the sum.
+
 ACE_INLINE ACE_Time_Value
 operator + (const ACE_Time_Value &tv1,
             const ACE_Time_Value &tv2)
@@ -384,7 +402,8 @@ operator + (const ACE_Time_Value &tv1,
   return sum;
 }
 
-/// Subtracts two ACE_Time_Value objects, returns the difference.
+// Subtracts two ACE_Time_Value objects, returns the difference.
+
 ACE_INLINE ACE_Time_Value
 operator - (const ACE_Time_Value &tv1,
             const ACE_Time_Value &tv2)
@@ -395,5 +414,9 @@ operator - (const ACE_Time_Value &tv1,
 
   return delta;
 }
+
+#if defined (ACE_WIN32) && defined (_WIN32_WCE)
+}
+#endif
 
 ACE_END_VERSIONED_NAMESPACE_DECL

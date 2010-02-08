@@ -17,7 +17,7 @@
 
 ACE_RCSID (ace,
            Acceptor,
-           "$Id: Acceptor.cpp 84935 2009-03-22 19:21:58Z schmidt $")
+           "$Id: Acceptor.cpp 81991 2008-06-16 19:05:40Z elliott_c $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -287,23 +287,12 @@ ACE_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::accept_svc_handler
   // created handle. This is because the newly created handle will
   // inherit the properties of the listen handle, including its event
   // associations.
-
-  ACE_Reactor *reactor = this->reactor ();
-  bool reset_new_handle;
-
-  if (reactor)
-    reset_new_handle = reactor->uses_event_associations ();
-  else
-    {
-      // Acceptor is closed, so reject this call
-      errno = EINVAL;
-      return -1;
-    }
+  int reset_new_handle = this->reactor ()->uses_event_associations ();
 
   if (this->acceptor ().accept (svc_handler->peer (), // stream
                                 0, // remote address
                                 0, // timeout
-                                true, // restart
+                                1, // restart
                                 reset_new_handle  // reset new handler
                                 ) == -1)
     {
@@ -995,7 +984,7 @@ template <class SVC_HANDLER, ACE_PEER_ACCEPTOR_1> int
 ACE_Oneshot_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::register_handler
   (SVC_HANDLER *svc_handler,
    const ACE_Synch_Options &synch_options,
-   bool restart)
+   int restart)
 {
   ACE_TRACE ("ACE_Oneshot_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::register_handler");
   // Can't do this if we don't have a Reactor.
@@ -1048,8 +1037,8 @@ ACE_Oneshot_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::shared_accept
   (SVC_HANDLER *svc_handler,
    ACE_PEER_ACCEPTOR_ADDR *remote_addr,
    ACE_Time_Value *timeout,
-   bool restart,
-   bool reset_new_handle)
+   int restart,
+   int reset_new_handle)
 {
   ACE_TRACE ("ACE_Oneshot_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::shared_accept");
   if (svc_handler == 0)
@@ -1085,8 +1074,8 @@ ACE_Oneshot_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::accept
   (SVC_HANDLER *svc_handler,
    ACE_PEER_ACCEPTOR_ADDR *remote_addr,
    const ACE_Synch_Options &synch_options,
-   bool restart,
-   bool reset_new_handle)
+   int restart,
+   int reset_new_handle)
 {
   ACE_TRACE ("ACE_Oneshot_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::accept");
   // Note that if timeout == ACE_Time_Value (x, y) where (x > 0 || y >
@@ -1139,7 +1128,7 @@ ACE_Oneshot_Acceptor<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::handle_input (ACE_HANDLE
   // created handle.  This is because the newly created handle will
   // inherit the properties of the listen handle, including its event
   // associations.
-  bool const reset_new_handle = this->reactor ()->uses_event_associations ();
+  int reset_new_handle = this->reactor ()->uses_event_associations ();
 
   // There is a use-case whereby this object will be gone upon return
   // from shared_accept - if the Svc_Handler deletes this Oneshot_Acceptor

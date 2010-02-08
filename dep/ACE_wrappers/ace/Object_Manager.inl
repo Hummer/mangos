@@ -1,41 +1,30 @@
 // -*- C++ -*-
 //
-// $Id: Object_Manager.inl 84163 2009-01-15 07:57:27Z johnnyw $
+// $Id: Object_Manager.inl 80826 2008-03-04 14:51:23Z wotte $
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_INLINE
 int
 ACE_Object_Manager::at_exit (ACE_Cleanup *object,
-                             void *param,
-                             const char* name)
+                             void *param)
 {
   return ACE_Object_Manager::instance ()->at_exit_i (
     object,
     (ACE_CLEANUP_FUNC) ACE_CLEANUP_DESTROYER_NAME,
-    param,
-    name);
+    param);
 }
 
 ACE_INLINE
 int
 ACE_Object_Manager::at_exit (void *object,
                              ACE_CLEANUP_FUNC cleanup_hook,
-                             void *param,
-                             const char* name)
+                             void *param)
 {
   return ACE_Object_Manager::instance ()->at_exit_i (
     object,
     cleanup_hook,
-    param,
-    name);
-}
-
-ACE_INLINE
-int
-ACE_Object_Manager::remove_at_exit (void *object)
-{
-  return ACE_Object_Manager::instance ()->remove_at_exit_i (object);
+    param);
 }
 
 ACE_INLINE

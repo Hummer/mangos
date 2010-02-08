@@ -4,7 +4,7 @@
 /**
  *  @file    Naming_Context.h
  *
- *  $Id: Naming_Context.h 84160 2009-01-14 14:13:58Z johnnyw $
+ *  $Id: Naming_Context.h 80826 2008-03-04 14:51:23Z wotte $
  *
  *  @author Gerhard Lenzer
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
@@ -337,17 +337,17 @@ public:
   void use_registry (bool x);
 
   /// Return debug status
-  bool debug (void);
+  int debug (void);
 
   /// Return verbose status
-  bool verbose (void);
+  int verbose (void);
 
 private:
   /// Extra debugging info
-  bool debugging_;
+  int debugging_;
 
   /// Extra verbose messages
-  bool verbosity_;
+  int verbosity_;
 
   /// Use Win32 Registry
   bool use_registry_;

@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_time.inl 87270 2009-10-29 21:47:47Z olli $
+// $Id: OS_NS_time.inl 80826 2008-03-04 14:51:23Z wotte $
 
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_errno.h"
@@ -97,7 +97,9 @@ ACE_INLINE ACE_TCHAR *
 ACE_OS::ctime (const time_t *t)
 {
   ACE_OS_TRACE ("ACE_OS::ctime");
-#if defined (ACE_HAS_WINCE)
+#if defined (ACE_HAS_BROKEN_CTIME)
+  ACE_OSCALL_RETURN (::asctime (::localtime (t)), char *, 0);
+#elif defined (ACE_HAS_WINCE)
   static ACE_TCHAR buf [ctime_buf_size];
   return ACE_OS::ctime_r (t,
                           buf,
@@ -122,7 +124,7 @@ ACE_OS::ctime (const time_t *t)
 #  else
   ACE_OSCALL_RETURN (::ctime (t), char *, 0);
 #  endif /* ACE_USES_WCHAR */
-# endif /* ACE_HAS_WINCE */
+# endif /* ACE_HAS_BROKEN_CTIME */
 }
 
 #if !defined (ACE_HAS_WINCE)  /* CE version in OS.cpp */
@@ -194,7 +196,7 @@ ACE_OS::ctime_r (const time_t *t, ACE_TCHAR *buf, int buflen)
       return 0;
     }
 
-  ACE_TCHAR *result = 0;
+  ACE_TCHAR *result;
 #     if defined (ACE_USES_WCHAR)
   ACE_OSCALL (::_wctime (t), wchar_t *, 0, result);
 #     else /* ACE_USES_WCHAR */
@@ -260,7 +262,7 @@ ACE_OS::gethrtime (const ACE_HRTimer_Op op)
 # endif /* ! ACE_LACKS_LONGLONG_T */
 
 #if defined (__amd64__) || defined (__x86_64__)
-  // Read the high res tick counter into 32 bit int variables "eax" and
+  // Read the high res tick counter into 32 bit int variables "eax" and 
   // "edx", and then combine them into 64 bit int "now"
   ACE_UINT32 eax, edx;
   asm volatile ("rdtsc" : "=a" (eax), "=d" (edx) : : "memory");
@@ -332,9 +334,8 @@ ACE_OS::gethrtime (const ACE_HRTimer_Op op)
   ACE_OS::clock_gettime (
 #if defined (ACE_HAS_CLOCK_GETTIME_MONOTONIC)
          CLOCK_MONOTONIC,
-#else
-         CLOCK_REALTIME,
 #endif /* !ACE_HAS_CLOCK_GETTIME_MONOTONIC */
+         CLOCK_REALTIME,
          &ts);
 
   // Carefully create the return value to avoid arithmetic overflow
@@ -442,11 +443,17 @@ ACE_OS::strftime (char *s, size_t maxsize, const char *format,
 ACE_INLINE char *
 ACE_OS::strptime (const char *buf, const char *format, struct tm *tm)
 {
-  ACE_OS::memset (tm, 0, sizeof (struct tm));
 #if defined (ACE_LACKS_STRPTIME)
+#  if defined (ACE_REFUSE_STRPTIME_EMULATION)
+  ACE_UNUSED_ARG (buf);
+  ACE_UNUSED_ARG (format);
+  ACE_UNUSED_ARG (tm);
+  ACE_NOTSUP_RETURN (0);
+#  else
   return ACE_OS::strptime_emulation (buf, format, tm);
+#  endif /* ACE_REFUSE_STRPTIME_EMULATION */
 #else
-  return ACE_STD_NAMESPACE::strptime (buf, format, tm);
+  return ::strptime (buf, format, tm);
 #endif /* ACE_LACKS_STRPTIME */
 }
 
@@ -454,14 +461,14 @@ ACE_INLINE time_t
 ACE_OS::time (time_t *tloc)
 {
   ACE_OS_TRACE ("ACE_OS::time");
-#if defined (ACE_LACKS_TIME)
-  time_t const retv = ACE_OS::gettimeofday ().sec ();
+#if !defined (ACE_HAS_WINCE)
+  ACE_OSCALL_RETURN (::time (tloc), time_t, (time_t) -1);
+#else
+  time_t retv = ACE_OS::gettimeofday ().sec ();
   if (tloc)
     *tloc = retv;
   return retv;
-#else
-  ACE_OSCALL_RETURN (::time (tloc), time_t, (time_t) -1);
-#endif /* ACE_LACKS_TIME */
+#endif /* ACE_HAS_WINCE */
 }
 
 // Linux won't compile unless we explicitly use a namespace here.
@@ -484,13 +491,15 @@ ACE_OS::timezone (void)
 ACE_INLINE void
 ACE_OS::tzset (void)
 {
-#if defined (ACE_LACKS_TZSET)
-  errno = ENOTSUP;
-#elif defined (ACE_WIN32)
+#if !defined (ACE_HAS_WINCE) && !defined (ACE_VXWORKS) && !defined(ACE_HAS_RTEMS) && !defined (ACE_HAS_DINKUM_STL)
+#   if defined (ACE_WIN32)
   ::_tzset ();  // For Win32.
-#else
+#   else
   ::tzset ();   // For UNIX platforms.
-#endif /* ACE_LACKS_TZSET */
+#   endif /* ACE_WIN32 */
+# else
+  errno = ENOTSUP;
+# endif /* ACE_HAS_WINCE && !VXWORKS && !ACE_HAS_RTEMS && !ACE_HAS_DINKUM_STL */
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL

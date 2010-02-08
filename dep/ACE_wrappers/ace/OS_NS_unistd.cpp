@@ -1,8 +1,8 @@
-// $Id: OS_NS_unistd.cpp 85906 2009-07-06 20:52:40Z mitza $
+// $Id: OS_NS_unistd.cpp 82559 2008-08-07 20:23:07Z parsons $
 
 #include "ace/OS_NS_unistd.h"
 
-ACE_RCSID (ace, OS_NS_unistd, "$Id: OS_NS_unistd.cpp 85906 2009-07-06 20:52:40Z mitza $")
+ACE_RCSID (ace, OS_NS_unistd, "$Id: OS_NS_unistd.cpp 82559 2008-08-07 20:23:07Z parsons $")
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/OS_NS_unistd.inl"
@@ -18,11 +18,6 @@ ACE_RCSID (ace, OS_NS_unistd, "$Id: OS_NS_unistd.cpp 85906 2009-07-06 20:52:40Z 
 #include "ace/Auto_Ptr.h"
 #include "ace/os_include/sys/os_pstat.h"
 #include "ace/os_include/sys/os_sysctl.h"
-
-#if defined ACE_HAS_VXCPULIB
-# include "vxCpuLib.h"
-# include "cpuset.h"
-#endif /* ACE_HAS_VXCPULIB */
 
 #if defined (ACE_NEEDS_FTRUNCATE)
 extern "C" int
@@ -69,10 +64,6 @@ ACE_OS::argv_to_string (int argc,
                         bool substitute_env_args,
                         bool quote_args)
 {
-#if defined (ACE_LACKS_STRENVDUP)
-  ACE_UNUSED_ARG (substitute_env_args);
-#endif /* ACE_LACKS_STRENVDUP */
-
   if (argc <= 0 || argv == 0 || argv[0] == 0)
     return 0;
 
@@ -84,7 +75,7 @@ ACE_OS::argv_to_string (int argc,
 
   for (int i = 0; i < argc; ++i)
     {
-#if !defined (ACE_LACKS_STRENVDUP)
+#if !defined (ACE_LACKS_ENV)
       // Account for environment variables.
       if (substitute_env_args
           && ACE_OS::strchr (argv[i], ACE_TEXT ('$')) != 0)
@@ -107,7 +98,7 @@ ACE_OS::argv_to_string (int argc,
               return 0;
             }
         }
-#endif /* ACE_LACKS_STRENVDUP */
+#endif /* ACE_LACKS_ENV */
       // If must quote, we only do it if the arg contains spaces, or
       // is empty. Perhaps a check for other c | ord(c) <= 32 is in
       // order?
@@ -136,8 +127,7 @@ ACE_OS::argv_to_string (int argc,
                   ++quotes;
             }
           argv_p[i] =
-            (ACE_TCHAR *) ACE_OS::malloc ((ACE_OS::strlen (temp) + quotes + 3)
-                                          * sizeof (ACE_TCHAR));
+            (ACE_TCHAR *) ACE_OS::malloc (ACE_OS::strlen (temp) * sizeof (ACE_TCHAR) + quotes + 3);
           if (argv_p[i] == 0)
             {
               ACE_OS::free (argv_p);
@@ -388,12 +378,10 @@ ACE_OS::num_processors (void)
   SYSTEM_INFO sys_info;
   ::GetSystemInfo (&sys_info);
   return sys_info.dwNumberOfProcessors;
-#elif defined (ACE_HAS_VXCPULIB)
-  return vxCpuConfiguredGet();
 #elif defined (_SC_NPROCESSORS_CONF)
   return ::sysconf (_SC_NPROCESSORS_CONF);
 #elif defined (ACE_HAS_SYSCTL)
-  int num_processors = 0;
+  int num_processors;
   int mib[2] = { CTL_HW, HW_NCPU };
   size_t len = sizeof (num_processors);
   if (::sysctl (mib, 2, &num_processors, &len, 0, 0) != -1)
@@ -430,20 +418,6 @@ ACE_OS::num_processors_online (void)
       mask >>= 1;
     }
   return active_processors;
-#elif defined (ACE_HAS_VXCPULIB)
-  long num_cpu = 0;
-  cpuset_t cpuset;
-  CPUSET_ZERO (cpuset);
-  cpuset = vxCpuEnabledGet();
-  unsigned int const maxcpu = vxCpuConfiguredGet();
-  for (unsigned int i =0; i < maxcpu; i++)
-    {
-      if (CPUSET_ISSET (cpuset, i))
-        {
-          ++num_cpu;
-        }
-    }
-  return num_cpu;
 #elif defined (_SC_NPROCESSORS_ONLN)
   return ::sysconf (_SC_NPROCESSORS_ONLN);
 #elif defined (ACE_HAS_SYSCTL)
@@ -512,10 +486,7 @@ ACE_OS::pread (ACE_HANDLE handle,
 
   if (original_low_position == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    {
-      ACE_OS::set_errno_to_last_error ();
-      return -1;
-    }
+    return -1;
 
   // Go to the correct position
   LONG low_offset = ACE_LOW_PART (offset);
@@ -526,10 +497,7 @@ ACE_OS::pread (ACE_HANDLE handle,
                                              FILE_BEGIN);
   if (altered_position == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    {
-      ACE_OS::set_errno_to_last_error ();
-      return -1;
-    }
+    return -1;
 
   DWORD bytes_read;
 
@@ -582,10 +550,7 @@ ACE_OS::pread (ACE_HANDLE handle,
                         &original_high_position,
                         FILE_BEGIN) == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    {
-      ACE_OS::set_errno_to_last_error ();
-      return -1;
-    }
+    return -1;
 
   return (ssize_t) bytes_read;
 
@@ -640,30 +605,27 @@ ACE_OS::pwrite (ACE_HANDLE handle,
   ACE_OS_GUARD
 
   // Remember the original file pointer position
-  LONG original_high_position = 0;
-  DWORD original_low_position = ::SetFilePointer (handle,
-                                                  0,
-                                                  &original_high_position,
-                                                  FILE_CURRENT);
-
-  if (original_low_position == INVALID_SET_FILE_POINTER
+  LARGE_INTEGER orig_position;
+  orig_position.QuadPart = 0;
+  orig_position.LowPart = ::SetFilePointer (handle,
+                                            0,
+                                            &orig_position.HighPart,
+                                            FILE_CURRENT);
+  if (orig_position.LowPart == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    {
-      ACE_OS::set_errno_to_last_error ();
-      return -1;
-    }
+    return -1;
 
   DWORD bytes_written;
-  LONG low_offset = ACE_LOW_PART (offset);
-  LONG high_offset = ACE_HIGH_PART (offset);
+  LARGE_INTEGER loffset;
+  loffset.QuadPart = offset;
 
 #     if defined (ACE_HAS_WIN32_OVERLAPPED_IO)
 
   OVERLAPPED overlapped;
   overlapped.Internal = 0;
   overlapped.InternalHigh = 0;
-  overlapped.Offset = low_offset;
-  overlapped.OffsetHigh = high_offset;
+  overlapped.Offset = loffset.LowPart;
+  overlapped.OffsetHigh = loffset.HighPart;
   overlapped.hEvent = 0;
 
   BOOL result = ::WriteFile (handle,
@@ -675,27 +637,35 @@ ACE_OS::pwrite (ACE_HANDLE handle,
   if (result == FALSE)
     {
       if (::GetLastError () != ERROR_IO_PENDING)
-        {
-          return -1;
-        }
-      else
-        {
-          result = ::GetOverlappedResult (handle,
-                                          &overlapped,
-                                          &bytes_written,
-                                          TRUE);
-          if (result == FALSE)
-            return -1;
-        }
+        return -1;
+
+      result = ::GetOverlappedResult (handle,
+                                      &overlapped,
+                                      &bytes_written,
+                                      TRUE);
+      if (result == FALSE)
+        return -1;
     }
 
 #     else /* ACE_HAS_WIN32_OVERLAPPED_IO */
 
-  if (::SetFilePointer (handle,
-                        low_offset,
-                        &high_offset,
-                        FILE_BEGIN) == INVALID_SET_FILE_POINTER
-                        && ::GetLastError () != NO_ERROR)
+  // Go to the correct position; if this is a Windows variant without
+  // overlapped I/O, it probably doesn't have SetFilePointerEx either,
+  // so manage this with SetFilePointer, changing calls based on the use
+  // of 64 bit offsets.
+  DWORD newpos;
+#       if defined (_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64
+  newpos = ::SetFilePointer (handle,
+                             loffset.LowPart,
+                             &loffset.HighPart,
+                             FILE_BEGIN);
+#       else
+  newpos = ::SetFilePointer (handle,
+                             loffset.LowPart,
+                             0,
+                             FILE_BEGIN);
+#       endif /* 64-bit file offsets */
+  if (newpos == 0xFFFFFFFF && ::GetLastError () != NO_ERROR)
     {
       ACE_OS::set_errno_to_last_error ();
       return -1;
@@ -713,14 +683,11 @@ ACE_OS::pwrite (ACE_HANDLE handle,
 
   // Reset the original file pointer position
   if (::SetFilePointer (handle,
-                        original_low_position,
-                        &original_high_position,
+                        orig_position.LowPart,
+                        &orig_position.HighPart,
                         FILE_BEGIN) == INVALID_SET_FILE_POINTER
       && GetLastError () != NO_ERROR)
-    {
-      ACE_OS::set_errno_to_last_error ();
-      return -1;
-    }
+    return -1;
 
   return (ssize_t) bytes_written;
 
@@ -767,10 +734,6 @@ ACE_OS::string_to_argv (ACE_TCHAR *buf,
                         ACE_TCHAR **&argv,
                         bool substitute_env_args)
 {
-#if defined (ACE_LACKS_STRENVDUP)
-  ACE_UNUSED_ARG (substitute_env_args);
-#endif /* ACE_LACKS_STRENVDUP */
-
   // Reset the number of arguments
   argc = 0;
 
@@ -864,7 +827,7 @@ ACE_OS::string_to_argv (ACE_TCHAR *buf,
 
       *cp = ACE_TEXT ('\0');
 
-#if !defined (ACE_LACKS_STRENVDUP)
+#if !defined (ACE_LACKS_ENV)
       // Check for environment variable substitution here.
       if (substitute_env_args) {
           argv[i] = ACE_OS::strenvdup (argp);
@@ -878,7 +841,7 @@ ACE_OS::string_to_argv (ACE_TCHAR *buf,
             }
       }
       else
-#endif /* ACE_LACKS_STRENVDUP */
+#endif /* ACE_LACKS_ENV */
         {
           argv[i] = ACE_OS::strdup (argp);
 
@@ -888,7 +851,7 @@ ACE_OS::string_to_argv (ACE_TCHAR *buf,
                 {
                   delete [] argp;
                 }
-
+                
               errno = ENOMEM;
               return -1;
             }

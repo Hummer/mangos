@@ -10,7 +10,7 @@
 
 ACE_RCSID (ace,
            CDR_Base,
-           "$Id: CDR_Base.cpp 86825 2009-09-28 17:45:23Z johnnyw $")
+           "$Id: CDR_Base.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -549,22 +549,20 @@ ACE_CDR::total_length (const ACE_Message_Block* begin,
   return l;
 }
 
-int
+void
 ACE_CDR::consolidate (ACE_Message_Block *dst,
                       const ACE_Message_Block *src)
 {
   if (src == 0)
-    return 0;
+    return;
 
-  size_t const newsize =
+  size_t newsize =
     ACE_CDR::first_size (ACE_CDR::total_length (src, 0)
                          + ACE_CDR::MAX_ALIGNMENT);
-
-  if (dst->size (newsize) == -1)
-    return -1;
+  dst->size (newsize);
 
 #if !defined (ACE_CDR_IGNORE_ALIGNMENT)
-  // We must copy the contents of src into the new buffer, but
+  // We must copy the contents of <src> into the new buffer, but
   // respecting the alignment.
   ptrdiff_t srcalign =
     ptrdiff_t(src->rd_ptr ()) % ACE_CDR::MAX_ALIGNMENT;
@@ -588,7 +586,6 @@ ACE_CDR::consolidate (ACE_Message_Block *dst,
       else
         dst->wr_ptr (i->length ());
     }
-  return 0;
 }
 
 #if defined (NONNATIVE_LONGLONG)

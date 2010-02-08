@@ -1,8 +1,8 @@
-// $Id: OS_NS_sys_socket.cpp 85460 2009-05-29 13:38:50Z msmit $
+// $Id: OS_NS_sys_socket.cpp 80826 2008-03-04 14:51:23Z wotte $
 
 #include "ace/OS_NS_sys_socket.h"
 
-ACE_RCSID(ace, OS_NS_sys_socket, "$Id: OS_NS_sys_socket.cpp 85460 2009-05-29 13:38:50Z msmit $")
+ACE_RCSID(ace, OS_NS_sys_socket, "$Id: OS_NS_sys_socket.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/OS_NS_sys_socket.inl"
@@ -14,6 +14,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 int ACE_OS::socket_initialized_;
 #endif /* ACE_WIN32 */
 
+#if !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500))
 ACE_HANDLE
 ACE_OS::accept (ACE_HANDLE handle,
                 struct sockaddr *addr,
@@ -94,6 +95,7 @@ ACE_OS::join_leaf (ACE_HANDLE socket,
   ACE_NOTSUP_RETURN (ACE_INVALID_HANDLE);
 # endif /* ACE_HAS_WINSOCK2 */
 }
+#endif  /* !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500)) */
 
 int
 ACE_OS::socket_init (int version_high, int version_low)

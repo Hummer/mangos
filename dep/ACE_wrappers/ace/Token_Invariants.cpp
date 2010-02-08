@@ -3,11 +3,10 @@
 #if defined (ACE_HAS_TOKENS_LIBRARY)
 
 #include "ace/Object_Manager.h"
-#include "ace/os_include/os_typeinfo.h"
 
 ACE_RCSID (ace,
            Token_Invariants,
-           "$Id: Token_Invariants.cpp 84179 2009-01-16 07:26:45Z johnnyw $")
+           "$Id: Token_Invariants.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -32,7 +31,7 @@ ACE_Token_Invariant_Manager::instance (void)
                           ACE_Token_Invariant_Manager,
                           0);
           // Register for destruction with ACE_Object_Manager.
-          ACE_Object_Manager::at_exit (instance_, 0, typeid (instance_).name ());
+          ACE_Object_Manager::at_exit (instance_);
         }
     }
 

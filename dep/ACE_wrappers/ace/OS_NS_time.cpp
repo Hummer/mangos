@@ -1,8 +1,8 @@
-// $Id: OS_NS_time.cpp 86094 2009-07-17 19:04:11Z schmidt $
+// $Id: OS_NS_time.cpp 82693 2008-09-09 11:37:41Z johnnyw $
 
 #include "ace/OS_NS_time.h"
 
-ACE_RCSID(ace, OS_NS_time, "$Id: OS_NS_time.cpp 86094 2009-07-17 19:04:11Z schmidt $")
+ACE_RCSID(ace, OS_NS_time, "$Id: OS_NS_time.cpp 82693 2008-09-09 11:37:41Z johnnyw $")
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/OS_NS_time.inl"
@@ -319,7 +319,6 @@ ACE_OS::mktime (struct tm *t)
   t_sys.wMonth = t->tm_mon + 1;  // SYSTEMTIME is 1-indexed, tm is 0-indexed
   t_sys.wYear = t->tm_year + 1900; // SYSTEMTIME is real; tm is since 1900
   t_sys.wDayOfWeek = t->tm_wday;  // Ignored in below function call.
-  t_sys.wMilliseconds = 0;
   if (SystemTimeToFileTime (&t_sys, &t_file) == 0)
     return -1;
   ACE_Time_Value tv (t_file);
@@ -355,7 +354,7 @@ ACE_OS::readPPCTimeBase (u_long &most, u_long &least)
 }
 #endif /* ACE_HAS_POWERPC_TIMER && ghs */
 
-#if defined (ACE_LACKS_STRPTIME)
+#if defined (ACE_LACKS_STRPTIME) && !defined (ACE_REFUSE_STRPTIME_EMULATION)
 char *
 ACE_OS::strptime_emulation (const char *buf, const char *format, struct tm *tm)
 {
@@ -365,6 +364,8 @@ ACE_OS::strptime_emulation (const char *buf, const char *format, struct tm *tm)
 
   if (!buf || !format)
     return 0;
+
+  ACE_OS::memset (tm, 0, sizeof (struct tm));
 
   while (format[fi] != '\0')
     {
@@ -631,6 +632,6 @@ ACE_OS::strptime_getnum (const char *buf,
   else
     return 0;
 }
-#endif /* ACE_LACKS_STRPTIME */
+#endif /* ACE_LACKS_STRPTIME && !ACE_REFUSE_STRPTIME_EMULATION */
 
 ACE_END_VERSIONED_NAMESPACE_DECL

@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Log_Msg.inl 82723 2008-09-16 09:35:44Z johnnyw $
+// $Id: Log_Msg.inl 80826 2008-03-04 14:51:23Z wotte $
 
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_unistd.h"
@@ -41,13 +41,13 @@ ACE_Log_Msg::op_status (void) const
 
 ACE_INLINE
 void
-ACE_Log_Msg::restart (bool r)
+ACE_Log_Msg::restart (int r)
 {
   this->restart_ = r;
 }
 
 ACE_INLINE
-bool
+int
 ACE_Log_Msg::restart (void) const
 {
   return this->restart_;

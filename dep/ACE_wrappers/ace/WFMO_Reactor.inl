@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: WFMO_Reactor.inl 82949 2008-10-06 22:32:10Z shuston $
+// $Id: WFMO_Reactor.inl 81138 2008-03-28 09:18:15Z johnnyw $
 
 #include "ace/Handle_Set.h"
 #include "ace/Reactor.h"
@@ -735,9 +735,7 @@ ACE_WFMO_Reactor::suspend_handlers (void)
   // First suspend all current handles
   bool changes_required = false;
 
-  // Skip over the notify and wakeup_all_threads handles. These are registered
-  // by ACE_WFMO_Reactor::open(), not by users, and should not be suspended.
-  for (size_t i = 2;
+  for (size_t i = 0;
        i < this->handler_rep_.max_handlep1_ && !error;
        i++)
     {
@@ -867,12 +865,12 @@ ACE_WFMO_Reactor::resume_handlers (void)
   return error ? -1 : 0;
 }
 
-ACE_INLINE bool
+ACE_INLINE int
 ACE_WFMO_Reactor::uses_event_associations (void)
 {
   // Since the WFMO_Reactor does use event associations, this function
   // always return 1.
-  return true;
+  return 1;
 }
 
 ACE_INLINE int
@@ -1106,16 +1104,16 @@ ACE_WFMO_Reactor::requeue_position (void)
   ACE_NOTSUP_RETURN (-1);
 }
 
-ACE_INLINE bool
+ACE_INLINE int
 ACE_WFMO_Reactor::restart (void)
 {
-  return false;
+  return 0;
 }
 
-ACE_INLINE bool
-ACE_WFMO_Reactor::restart (bool)
+ACE_INLINE int
+ACE_WFMO_Reactor::restart (int)
 {
-  return false;
+  return 0;
 }
 
 ACE_INLINE int

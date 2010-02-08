@@ -9,7 +9,7 @@
 
 ACE_RCSID (ace,
            SV_Semaphore_Simple,
-           "$Id: SV_Semaphore_Simple.cpp 85110 2009-04-20 09:18:43Z msmit $")
+           "$Id: SV_Semaphore_Simple.cpp 82559 2008-08-07 20:23:07Z parsons $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -138,15 +138,15 @@ ACE_SV_Semaphore_Simple::name_2_key (const char *name)
   // Basically "hash" the values in the <name>.  This won't
   // necessarily guarantee uniqueness of all keys.
   // But (IMHO) CRC32 is good enough for most purposes (Carlos)
-#if defined (ACE_WIN32) && defined (_MSC_VER)
+#if defined (ACE_WIN64) || defined (ACE_WIN32)
   // The cast below is legit...
 #  pragma warning(push)
 #  pragma warning(disable : 4312)
-#endif /* defined (ACE_WIN32) && defined (_MSC_VER) */
+#endif /* ACE_WIN64 */
   return (key_t) ACE::crc32 (name);
-#if defined (ACE_WIN32) && defined (_MSC_VER)
+#if defined (ACE_WIN64) || defined (ACE_WIN32)
 #  pragma warning(pop)
-#endif /* defined (ACE_WIN32) && defined (_MSC_VER) */
+#endif /* ACE_WIN64 */
 }
 
 // Open or create a ACE_SV_Semaphore.  We return 1 if all is OK, else

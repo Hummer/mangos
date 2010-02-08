@@ -1,5 +1,5 @@
 // -*- C++ -*-
-// $Id: OS_NS_arpa_inet.inl 84249 2009-01-28 09:09:41Z johnnyw $
+// $Id: OS_NS_arpa_inet.inl 80826 2008-03-04 14:51:23Z wotte $
 
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_errno.h"
@@ -14,11 +14,11 @@ ACE_OS::inet_addr (const char *name)
 #if defined (ACE_LACKS_INET_ADDR)
   ACE_UNUSED_ARG (name);
   ACE_NOTSUP_RETURN (0);
-#elif defined (ACE_HAS_NONCONST_INET_ADDR)
+#elif defined (ACE_HAS_NONCONST_GETBY)
   return ::inet_addr (const_cast <char*> (name));
 #else
   return ::inet_addr (name);
-#endif /* ACE_HAS_NONCONST_INET_ADDR */
+#endif /* ACE_HAS_NONCONST_GETBY */
 }
 
 ACE_INLINE char *

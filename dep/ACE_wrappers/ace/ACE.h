@@ -4,7 +4,7 @@
 /**
  * @file    ACE.h
  *
- * $Id: ACE.h 88193 2009-12-16 09:14:06Z mcorino $
+ * $Id: ACE.h 82581 2008-08-11 08:58:24Z johnnyw $
  *
  * This file contains value added ACE functions that extend the
  * behavior of the UNIX and Win32 OS calls.
@@ -90,13 +90,7 @@ namespace ACE
 
   /// Simple wildcard matching function supporting '*' and '?'
   /// return true if string s matches pattern.
-  /// If character_classes is true, '[' is treated as a wildcard character
-  /// as described in the fnmatch() POSIX API.  The following POSIX "bracket
-  /// expression" features are not implemented: collating symbols, equivalence
-  /// class expressions, and character class expressions.  The POSIX locale is
-  /// assumed.
-  extern ACE_Export bool wild_match(const char* s, const char* pattern,
-    bool case_sensitive = true, bool character_classes = false);
+  extern ACE_Export bool wild_match(const char* s, const char* pattern, bool case_sensitive = true);
 
   /**
    * @name I/O operations
@@ -360,7 +354,7 @@ namespace ACE
    */
   extern ACE_Export int handle_timed_accept (ACE_HANDLE listener,
                                              ACE_Time_Value *timeout,
-                                             bool restart);
+                                             int restart);
 
   /**
    * Wait up to @a timeout amount of time to complete an actively
@@ -390,6 +384,7 @@ namespace ACE
   extern ACE_Export int max_handles (void);
 
   // = String functions
+#if !defined (ACE_HAS_WINCE)
   /**
    * Return a dynamically allocated duplicate of @a str, substituting
    * the environment variable if @c str[0] @c == @c '$'.  Note that
@@ -397,6 +392,7 @@ namespace ACE
    * by @c ACE_OS::free.
    */
   extern ACE_Export ACE_TCHAR *strenvdup (const ACE_TCHAR *str);
+#endif /* ACE_HAS_WINCE */
 
   /// Returns a pointer to the "end" of the string, i.e., the character
   /// past the '\0'.
@@ -418,9 +414,6 @@ namespace ACE
   /// @c ACE_OS::malloc to allocate the new string.
   extern ACE_Export char *strnnew (const char *str, size_t n);
 
-  /// Determine if a specified pathname is "dot dir" (ie. "." or "..").
-  ACE_NAMESPACE_INLINE_FUNCTION bool isdotdir (const char *s);
-
 #if defined (ACE_HAS_WCHAR)
   extern ACE_Export const wchar_t *strend (const wchar_t *s);
 
@@ -431,8 +424,6 @@ namespace ACE
   extern ACE_Export wchar_t *strndup (const wchar_t *str, size_t n);
 
   extern ACE_Export wchar_t *strnnew (const wchar_t *str, size_t n);
-
-  ACE_NAMESPACE_INLINE_FUNCTION bool isdotdir (const wchar_t *s);
 
 #endif /* ACE_HAS_WCHAR */
 
@@ -472,22 +463,6 @@ namespace ACE
   extern ACE_Export const ACE_TCHAR *dirname (const ACE_TCHAR *pathname,
                                               ACE_TCHAR delim =
                                               ACE_DIRECTORY_SEPARATOR_CHAR);
-
-  /**
-   * Returns the given timestamp in the form
-   * "hour:minute:second:microsecond."  The month, day, and year are
-   * also stored in the beginning of the @a date_and_time array, which
-   * is a user-supplied array of size @a time_len> @c ACE_TCHARs.
-   * Returns 0 if unsuccessful, else returns pointer to beginning of the
-   * "time" portion of @a date_and_time.  If @a
-   * return_pointer_to_first_digit is 0 then return a pointer to the
-   * space before the time, else return a pointer to the beginning of
-   * the time portion.
-   */
-  extern ACE_Export ACE_TCHAR *timestamp (const ACE_Time_Value& time_value,
-                                          ACE_TCHAR date_and_time[],
-                                          size_t time_len,
-                                          bool return_pointer_to_first_digit = false);
 
   /**
    * Returns the current timestamp in the form
@@ -643,7 +618,7 @@ namespace ACE
   ACE_NAMESPACE_INLINE_FUNCTION u_long log2 (u_long num);
 
   /// Hex conversion utility.
-  extern ACE_Export ACE_TCHAR nibble2hex (u_int n);
+  ACE_NAMESPACE_INLINE_FUNCTION ACE_TCHAR nibble2hex (u_int n);
 
   /// Convert a hex character to its byte representation.
   ACE_NAMESPACE_INLINE_FUNCTION u_char hex2byte (ACE_TCHAR c);

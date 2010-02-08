@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_sys_socket.inl 85632 2009-06-12 19:28:00Z mitza $
+// $Id: OS_NS_sys_socket.inl 82342 2008-07-17 19:52:57Z shuston $
 
 #include "ace/OS_NS_errno.h"
 #include "ace/OS_NS_macros.h"
@@ -520,12 +520,15 @@ ACE_OS::recvv (ACE_HANDLE handle,
                       0,
                       0);
 # else
+  int i, chunklen;
+  char *chunkp = 0;
+
   // Step through the buffers requested by caller; for each one, cycle
   // through reads until it's filled or an error occurs.
-  for (int i = 0; i < n && result > 0; ++i)
+  for (i = 0; i < n && result > 0; ++i)
     {
-      char *chunkp = buffers[i].iov_base;     // Point to part of chunk being read
-      int chunklen = buffers[i].iov_len;    // Track how much to read to chunk
+      chunkp = buffers[i].iov_base;     // Point to part of chunk being read
+      chunklen = buffers[i].iov_len;    // Track how much to read to chunk
       while (chunklen > 0 && result > 0)
         {
           result = ::recv ((SOCKET) handle, chunkp, chunklen, 0);
@@ -750,7 +753,7 @@ ACE_OS::sendv (ACE_HANDLE handle,
 
   // Winsock 2 has WSASend and can do this directly, but Winsock 1
   // needs to do the sends one-by-one.
-# if (ACE_HAS_WINSOCK2 != 0) && !defined (ACE_DONT_USE_WSASEND)
+# if (ACE_HAS_WINSOCK2 != 0)
   result = ::WSASend ((SOCKET) handle,
                       (WSABUF *) buffers,
                       n,
@@ -875,7 +878,7 @@ ACE_OS::setsockopt (ACE_HANDLE handle,
                 -1,
                 result);
 #if defined (WSAEOPNOTSUPP)
-  if (result == -1 && (errno == WSAEOPNOTSUPP || errno == WSAENOPROTOOPT))
+  if (result == -1 && errno == WSAEOPNOTSUPP)
 #else
   if (result == -1)
 #endif /* WSAEOPNOTSUPP */

@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: CDR_Stream.inl 84206 2009-01-21 02:49:26Z schmidt $
+// $Id: CDR_Stream.inl 82350 2008-07-22 07:36:47Z johnnyw $
 
 #include "ace/OS_NS_string.h"
 #include "ace/OS_Memory.h"
@@ -572,6 +572,7 @@ ACE_OutputCDR::current_alignment (size_t current_alignment)
   this->current_alignment_ = current_alignment;
 #else
   ACE_UNUSED_ARG (current_alignment);
+  return 0;
 #endif /* ACE_LACKS_CDR_ALIGNMENT */
 }
 

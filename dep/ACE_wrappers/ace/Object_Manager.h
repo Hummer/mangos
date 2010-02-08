@@ -4,7 +4,7 @@
 /**
  *  @file    Object_Manager.h
  *
- *  $Id: Object_Manager.h 84163 2009-01-15 07:57:27Z johnnyw $
+ *  $Id: Object_Manager.h 80826 2008-03-04 14:51:23Z wotte $
  *
  *  @author David L. Levine <levine@cs.wustl.edu>
  *  @author Matthias Kerkhoff
@@ -237,13 +237,13 @@ public:
    * Register an ACE_Cleanup object for cleanup at process
    * termination.  The object is deleted via the
    * <ace_cleanup_destroyer>.  If you need more flexiblity, see the
-   * @c other at_exit method below.  For OS's that do not have
+   * <other at_exit> method below.  For OS's that do not have
    * processes, cleanup takes place at the end of <main>.  Returns 0
    * on success.  On failure, returns -1 and sets errno to: EAGAIN if
    * shutting down, ENOMEM if insufficient virtual memory, or EEXIST
    * if the object (or array) had already been registered.
    */
-  static int at_exit (ACE_Cleanup *object, void *param = 0, const char* name = 0);
+  static int at_exit (ACE_Cleanup *object, void *param = 0);
 
 #if defined (ACE_HAS_TSS_EMULATION)
   static int init_tss (void);
@@ -256,8 +256,8 @@ public:
    * that is called for the object or array when it to be destroyed.
    * It may perform any necessary cleanup specific for that object or
    * its class.  "param" is passed as the second parameter to the
-   * @a cleanup_hook function; the first parameter is the object (or
-   * array) to be destroyed.  @a cleanup_hook, for example, may delete
+   * "cleanup_hook" function; the first parameter is the object (or
+   * array) to be destroyed.  "cleanup_hook", for example, may delete
    * the object (or array).  For OS's that do not have processes, this
    * function is the same as <at_thread_exit>.  Returns 0 on success.
    * On failure, returns -1 and sets errno to: EAGAIN if shutting
@@ -266,18 +266,14 @@ public:
    */
   static int at_exit (void *object,
                       ACE_CLEANUP_FUNC cleanup_hook,
-                      void *param,
-                      const char* name = 0);
-
-  static int remove_at_exit (void *object);
+                      void *param);
 
 #if 0 /* not implemented yet */
   /// Similar to <at_exit>, except that the cleanup_hook is called
   /// when the current thread exits instead of when the program terminates.
   static int at_thread_exit (void *object,
                              ACE_CLEANUP_FUNC cleanup_hook,
-                             void *param,
-                             const char* name);
+                             void *param);
 #endif /* 0 */
 
   /// Unique identifiers for preallocated objects.  Please see
@@ -347,11 +343,7 @@ private:
 
   /// Register an object or array for deletion at program termination.
   /// See description of static version above for return values.
-  int at_exit_i (void *object, ACE_CLEANUP_FUNC cleanup_hook, void *param, const char* name);
-
-  /// Remove an object for deletion at program termination.
-  /// See description of static version above for return values.
-  int remove_at_exit_i (void *object);
+  int at_exit_i (void *object, ACE_CLEANUP_FUNC cleanup_hook, void *param);
 
 #if defined (ACE_MT_SAFE) && (ACE_MT_SAFE != 0)
 public:

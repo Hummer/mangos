@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-hpux-11.00.h 87169 2009-10-19 20:26:55Z olli $
+// $Id: config-hpux-11.00.h 81992 2008-06-16 19:09:50Z wotte $
 
 // The following configuration file is designed to work for HP
 // platforms running HP-UX 11.00 using aC++ or gcc (2.95 and up).
@@ -284,10 +284,16 @@
 
 #define ACE_HAS_XPG4_MULTIBYTE_CHAR
 
+/* Platform/compiler supports _sys_errlist symbol */
+#define ACE_HAS_SYS_ERRLIST 1
+
 #define ACE_HAS_UALARM
 
 // Platform supports ucontext_t (which is used in the extended signal API).
 #define ACE_HAS_UCONTEXT_T
+
+// Compiler/platform supports strerror ().
+#define ACE_HAS_STRERROR
 
 // Platform/compiler supports void * as second parameter to gettimeofday().
 #define ACE_HAS_VOIDPTR_GETTIMEOFDAY
@@ -331,17 +337,10 @@
 #define ACE_LACKS_SUSECONDS_T
 #define ACE_LACKS_SYS_SYSCTL_H
 
-// @@ TODO: It looks like HP-UX provides strtoll, strtoull, wcstoll and
-//          wcstoull but some more work is needed to plug them in correctly.
-#define ACE_LACKS_STRTOLL
-#define ACE_LACKS_WCSTOLL
+// @@ TODO: It looks like HP-UX provides strtoull and wcstoull
+//          but some more work is needed to plug them in correctly.
 #define ACE_LACKS_STRTOULL
 #define ACE_LACKS_WCSTOULL
-
-#define ACE_LACKS_ISWASCII
-
-#define ACE_LACKS_SETENV
-#define ACE_LACKS_UNSETENV
 
 // Shared library name/path components
 #if defined (__ia64)
@@ -361,7 +360,6 @@
 
 #define ACE_HAS_3_PARAM_READDIR_R
 
-#define ACE_LACKS_STRUCT_LIFNUM
 
 //////////////////////////////////////////////////////////////////////////
 //
