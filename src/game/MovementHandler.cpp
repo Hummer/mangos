@@ -230,7 +230,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     Unit *mover = _player->m_mover;
     Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
-
+    if(plMover == NULL)
+    {
+	return;
+    }
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if(plMover && plMover->IsBeingTeleported())
     {
@@ -447,12 +450,6 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
 
     uint64 guid;
     recv_data >> guid;
-
-    if(_player->m_mover->GetGUID() != guid)
-    {
-        sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " I64FMT " and should be " I64FMT, _player->m_mover->GetGUID(), guid);
-        return;
-    }
 }
 
 void WorldSession::HandleMoveNotActiveMover(WorldPacket &recv_data)
